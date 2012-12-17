@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package>
+	<displayName>Image Presets Displayer</displayName>
+	<shortDescription>Images handler that will generate image thumbs and serve them when displayed</shortDescription>
+	<docUrl>http://www.google.com/</docUrl>
+	<logo>logo.png</logo>
+	<requires>
+		<require>StaticImageDisplayer.php</require>
+	</requires>
+	<dependencies>
+		<dependency>
+			<group>utils/graphics</group>
+			<name>moufimage</name>
+			<version>>=1.0</version>
+		</dependency>
+	</dependencies>
+	<adminRequires>
+		<require>ValidatorDescriptor.php</require>
+    </adminRequires>
+</package>
