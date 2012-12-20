@@ -21,5 +21,12 @@
         "psr-0": {
             "Mouf": "src/"
         }
+    },
+    "extra": {
+	     "mouf": {
+			"require-admin": [
+    			"src/ValidatorDescriptor.php"
+    		]
+		}
     }
 }
