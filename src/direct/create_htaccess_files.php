@@ -19,7 +19,7 @@ RewriteBase ".ROOT_URL."$instance->savePath
 	
 RewriteCond %{REQUEST_FILENAME} !-f
 	
-RewriteRule ^(.*)$ ".ROOT_URL."plugins/utils/graphics/moufimage/$versionFolder/direct/displayImage.php?instance=$instance&url=$1";
+RewriteRule ^(.*)$ ".ROOT_URL."plugins/utils/graphics/imagepresetdisplayer/$versionFolder/direct/displayImage.php?instance=$instance&url=$1";
 
 // 	echo $htAccessPath;
 	$savePath = ROOT_PATH . $instanceObj->savePath;

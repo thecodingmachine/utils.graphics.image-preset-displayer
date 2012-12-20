@@ -1,12 +1,10 @@
 <?php
-namespace Mouf\Utils\Graphics\ImagePresetDisplayer;
-
 /**
  * This Class will handle the display of MoufImages. 
  * <p>Images are successively processed by a set of instances implementing MoufImageInterface, and then, the final image resource will be outputed.
  * The first time the image is generated, it is saved. If you ask for the same image, the saved copy will be served, in order to save some time.</p>
  * <p>The StaticImageDisplayer is called by using a direct URL inside this package:</p> 
- *   <em>ROOT_URL/vendor/utils/graphics/moufimage/1.0/direct/displayImage.php</em>
+ *   <em>ROOT_URL/plugins/utils/graphics/moufimage/1.0/direct/displayImage.php</em>
  *  <p>This URL should be called using 2 parameters:</p>
  *  <ul>
  *  	<li>instance: name of the StaticImageDisplayer instance</li> 
@@ -154,7 +152,7 @@ class StaticImageDisplayer{
 			header('Content-Type: image/gif');
 			imagegif($finalImage);
 		} elseif( $image_type == IMAGETYPE_PNG ) {
-			header('Content-Type: image/jpeg');
+			header('Content-Type: image/png');
 			imagepng($finalImage);
 		}
 		imagedestroy($finalImage);
