@@ -1,4 +1,14 @@
 <?php
+namespace Mouf\Utils\Graphics\ImagePresetDisplayer;
+
+use Mouf\Validator\MoufValidatorResult;
+
+use Mouf\MoufManager;
+
+use Mouf\Validator\MoufValidatorInterface;
+
+use Mouf\Utils\Graphics\MoufImage\MoufImageInterface;
+use Mouf\Utils\Graphics\MoufImage\Filters\MoufImageFromFile;
 /**
  * This Class will handle the display of MoufImages. 
  * <p>Images are successively processed by a set of instances implementing MoufImageInterface, and then, the final image resource will be outputed.
@@ -22,13 +32,13 @@
  * @author Kevin
  *
  */
-class StaticImageDisplayer{
+class StaticImageDisplayer implements MoufValidatorInterface {
 	
 	/**
 	 * The name of the MoufImageFromFile instance that will be the first to load the image from the given input $sourceFileName
 	 * @Property
 	 * @Compulsory
-	 * @var MoufImageFromFile $initialImageFilter
+	 * @var MoufImageFromFile
 	 */
 	public $initialImageFilter;
 	
@@ -36,7 +46,7 @@ class StaticImageDisplayer{
 	 * The MoufImage instance's name that delivers the final image resource, with all applied effects
 	 * @Property
 	 * @Compulsory
-	 * @var MoufImageInterface $imageSource
+	 * @var MoufImageInterface
 	 */
 	public $imageSource;
 	
@@ -45,7 +55,7 @@ class StaticImageDisplayer{
 	 * This path is relative to the applcation's ROOT_PATH, and should have trailing slashes.
 	 * @Property
 	 * @Compulsory
-	 * @var string $savePath
+	 * @var string
 	 */
 	public $savePath;
 	
@@ -54,7 +64,7 @@ class StaticImageDisplayer{
 	 * This path is relative to the application's ROOT_PATH, and should have trailing slashes.
 	 * @Property
 	 * @Compulsory
-	 * @var string $basePath
+	 * @var string
 	 */
 	public $basePath;
 	
@@ -63,28 +73,28 @@ class StaticImageDisplayer{
 	 * The path to the original image file, relative to the $basePath.
 	 * The file name should not contain any '..' strings (for security reasons, the component dosn't allow users to access files outside the $basePath),
 	 * but it may contain folders (ex: sub_folder/image.jpeg).
-	 * @var string $sourceFileName
+	 * @var string
 	 */
 	public $sourceFileName;
 	
 	/**
 	 * The Quality that should be applied in case the original image is of JPEG type (0 to 100).
 	 * @Property
-	 * @var int $jpegQuality
+	 * @var int
 	 */
 	public $jpegQuality = 75;
 	
 	/**
 	 * The Quality that should be applied in case the original image is of PNG type (0 to 9).
 	 * @Property
-	 * @var int $pngQuality
+	 * @var int
 	 */
 	public $pngQuality = 6;
 	
 	/**
 	 * The path to the default image if not found
 	 * @Property
-	 * @var int $pngQuality
+	 * @var int
 	 */
 	public $defaultImagePath;
 	
@@ -126,8 +136,7 @@ class StaticImageDisplayer{
 		$created = true;
 		if (!file_exists($finalPath) && !$is404){
 			//if sourceFileName contains sub folders, create them
-			$subPath = dirname($this->sourceFileName);
-			if ($subPath != '.' && !file_exists(ROOT_PATH . $this->savePath . DIRECTORY_SEPARATOR . $subPath)){
+			if (/*$subPath != '.' && */!file_exists(ROOT_PATH . $this->savePath)){
 				$dirCreate = mkdir(ROOT_PATH . $this->savePath . DIRECTORY_SEPARATOR . $subPath, 0777, true);
 				if (!$dirCreate) throw new Exception("Could't create subfolders '$subPath' in " . ROOT_PATH . $this->savePath);
 			}
@@ -169,5 +178,18 @@ class StaticImageDisplayer{
 	
 	public function toHTML($path){
 		echo "<img src='" . $this->getURL($path) . "'/>";
+	}
+	
+	public function validateInstance(){
+		$instanceName = MoufManager::getMoufManager()->findInstanceName($this);
+		$htAccessPath = ROOT_PATH.$this->savePath.DIRECTORY_SEPARATOR.".htaccess";
+		error_log("Validate imagedisplayer :: $instanceName");
+		if (!file_exists($htAccessPath)){
+			return new MoufValidatorResult(MoufValidatorResult::ERROR, "<b>Image Displayer: </b>Unable to find .htaccess file for instance: $instanceName <br/>" .
+					"<a href='".ROOT_URL."vendor/mouf/utils.graphics.image-preset-displayer/src/direct/create_htaccess_files.php?instanceName=$instanceName'>Create .htaccess file</a>");
+		}else{
+			return new MoufValidatorResult(MoufValidatorResult::SUCCESS, "<b>Image Displayer: </b>.htaccess file found for instance $instanceName.");
+		}
+		
 	}
 }

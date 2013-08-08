@@ -1,32 +1,29 @@
 <?php
-require_once dirname(__FILE__)."/../../../../../../Mouf.php";
+use Mouf\MoufUtils;
+use Mouf\MoufManager;
+require_once '../../../../../mouf/Mouf.php';
 
-$instances = $_GET['instances'];
+// Note: checking rights is done after loading the required files because we need to open the session
+// and only after can we check if it was not loaded before loading it ourselves...
+MoufUtils::checkRights();
 
-$instances = explode("|", $instances);
-
-foreach ($instances as $instance) {
-	$instanceObj = MoufManager::getMoufManager()->getInstance($instance);
+$instanceName = $_GET['instanceName'];
+$instanceObj = MoufManager::getMoufManager()->getInstance($instanceName);
 	
-	$dirName = dirname(__FILE__);
-	$dir = dirname($dirName);
-	$versionFolder = basename($dir);
-	
-	$htAccessPath = ROOT_PATH.$instanceObj->savePath.DIRECTORY_SEPARATOR.".htaccess";
+$htAccessPath = ROOT_PATH.$instanceObj->savePath.".htaccess";
 	$str = "Options FollowSymLinks
 RewriteEngine on
-RewriteBase ".ROOT_URL."$instance->savePath
+RewriteBase ".ROOT_URL."$instanceObj->savePath
 	
 RewriteCond %{REQUEST_FILENAME} !-f
 	
-RewriteRule ^(.*)$ ".ROOT_URL."plugins/utils/graphics/imagepresetdisplayer/$versionFolder/direct/displayImage.php?instance=$instance&url=$1";
+RewriteRule ^(.*)$ ".ROOT_URL."vendor/mouf/utils.graphics.image-preset-displayer/src/direct/displayImage.php?instance=$instanceName&url=$1";
 
-// 	echo $htAccessPath;
-	$savePath = ROOT_PATH . $instanceObj->savePath;
-	if (!file_exists()){
-		mkdir($savePath, 0777, true);
-	}
 	
-	file_put_contents($htAccessPath, $str);
+$savePath = ROOT_PATH . $instanceObj->savePath;
+if (!file_exists()){
+	mkdir($savePath, 0777, true);
 }
-header("Location: ".ROOT_URL."mouf");
+	
+file_put_contents($htAccessPath, $str);
+header("Location: ".ROOT_URL."vendor/mouf/mouf");

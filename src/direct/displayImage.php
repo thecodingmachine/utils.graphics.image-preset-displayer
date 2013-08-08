@@ -1,5 +1,6 @@
 <?php
-require_once dirname(__FILE__).'/../../../../../../Mouf.php';
+use Mouf\MoufManager;
+require_once '../../../../../mouf/Mouf.php';
 
 $diplayerInstance = $_GET['instance'];
 $sourceFileName = $_GET['url'];
