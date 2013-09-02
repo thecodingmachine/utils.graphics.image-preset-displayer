@@ -21,7 +21,7 @@ RewriteRule ^(.*)$ ".ROOT_URL."vendor/mouf/utils.graphics.image-preset-displayer
 
 	
 $savePath = ROOT_PATH . $instanceObj->savePath;
-if (!file_exists()){
+if (!file_exists($savePath)){
 	mkdir($savePath, 0777, true);
 }
 	
