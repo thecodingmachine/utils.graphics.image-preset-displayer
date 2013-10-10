@@ -135,8 +135,13 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 		if (!file_exists($finalPath) && !$is404){
 			//if sourceFileName contains sub folders, create them
 			if (/*$subPath != '.' && */!file_exists(ROOT_PATH . $this->getSavePath())){
-				$dirCreate = mkdir(ROOT_PATH . $this->getSavePath() . DIRECTORY_SEPARATOR . $subPath, 0777, true);
-				if (!$dirCreate) throw new Exception("Could't create subfolders '$subPath' in " . ROOT_PATH . $this->getSavePath());
+				$oldUmask = umask();
+				umask(0);
+				$dirCreate = mkdir(ROOT_PATH . $this->getSavePath() . DIRECTORY_SEPARATOR . $subPath, 0775, true);
+				umask($oldUmask);
+				if (!$dirCreate) {
+					throw new \Exception("Could't create subfolders '$subPath' in " . ROOT_PATH . $this->getSavePath());
+				}
 			}
 			
 			//create the image
@@ -147,6 +152,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 			} elseif( $image_type == IMAGETYPE_PNG ) {
 				$created = imagepng($finalImage, $finalPath, $this->pngQuality);
 			}
+			chmod($finalPath, 0664);
 		}
 		
 		if (!$created && !$is404) throw new Exception("File could not be created: $finalPath");
@@ -184,7 +190,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 		error_log("Validate imagedisplayer :: $instanceName");
 		if (!file_exists($htAccessPath)){
 			return new MoufValidatorResult(MoufValidatorResult::ERROR, "<b>Image Displayer: </b>Unable to find .htaccess file for instance: $instanceName <br/>" .
-					"<a href='".ROOT_URL."vendor/mouf/utils.graphics.image-preset-displayer/src/direct/create_htaccess_files.php?instanceName=$instanceName'>Create .htaccess file</a>");
+					"<a href='".MOUF_URL."staticimagedisplayer/?name=$instanceName' class='btn btn-primary'>Create .htaccess file</a>");
 		}else{
 			return new MoufValidatorResult(MoufValidatorResult::SUCCESS, "<b>Image Displayer: </b>.htaccess file found for instance $instanceName.");
 		}
@@ -194,8 +200,9 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 	 * Writes the .htaccess file.
 	 */
 	public function writeHtAccess() {
+		$instanceName = MoufManager::getMoufManager()->findInstanceName($this);
 		$savePath = $this->getSavePath();
-		$htAccessPath = ROOT_PATH.$savePath.".htaccess";
+		$htAccessPath = ROOT_PATH.$savePath."/.htaccess";
 		
 		// Let's count the number of '/' in the savePath.
 		$nbLevels = substr_count($savePath, '/')+1;
@@ -212,27 +219,27 @@ class StaticImageDisplayer implements MoufValidatorInterface {
     # work in environments without path prefix as well, providing a safe, one-size
     # fits all solution. But as you do not need it in this case, you can comment
     # the following 2 lines to eliminate the overhead.
-    RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\2$
+    RewriteCond %{REQUEST_URI}::$1 ^(/.+)/(.*)::\\2$
     RewriteRule ^(.*) - [E=BASE:%1]
     
 
     # If the requested filename exists, and has an allowed extension, simply serve it.
     # We only want to let Apache serve files and not directories.
-    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_FILENAME} !-f
     
     # Rewrite all other queries to the front controller.
-    RewriteRule .? %{ENV:BASE}".str_repeat("/..", $nbLevels)."/vendor/mouf/utils.graphics.image-preset-displayer/src/direct/displayImage.php?instance=$instanceName&url=$1 [L]
+    RewriteRule ^(.*)$ %{ENV:BASE}".str_repeat("/..", $nbLevels)."/vendor/mouf/utils.graphics.image-preset-displayer/src/direct/displayImage.php?instance=$instanceName&url=$1 [L]
 </IfModule>
 
 #<IfModule !mod_rewrite.c>
 	# Use an error page as index file. It makes sure a proper error is displayed if
 	# mod_rewrite is not available. Additionally, this reduces the matching process for the
-	# start page (path "/") because otherwise Apache will apply the rewriting rules
+	# start page (path \"/\") because otherwise Apache will apply the rewriting rules
 	# to each configured DirectoryIndex file (e.g. index.php, index.html, index.pl).
 #	DirectoryIndex vendor/mouf/mvc.splash/src/rewrite_missing.php
 #</IfModule>";
 		
-		$savePath = ROOT_PATH . $instanceObj->savePath;
+		$savePath = ROOT_PATH . $this->savePath;
 		if (!file_exists($savePath)){
 			$oldUmask = umask();
 			umask(0);
@@ -240,13 +247,14 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 			umask($oldUmask);
 		}
 		
-		file_put_contents($htAccessPath, $str);		
+		file_put_contents($htAccessPath, $str);
+		chmod($htAccessPath, 0664);
 	}
 	
 	/**
 	 * Returns the save path in "clean form" (no slashes before or after).
 	 */
 	private function getSavePath() {
-		return str_replace('\\', '/', trim($this->savePath."/\\"));
+		return str_replace("\\", "/", trim($this->savePath, "/\\"));
 	}
 }

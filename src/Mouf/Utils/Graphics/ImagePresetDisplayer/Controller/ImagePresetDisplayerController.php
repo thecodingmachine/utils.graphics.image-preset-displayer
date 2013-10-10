@@ -1,5 +1,5 @@
 <?php
-namespace Mouf\Utils\Graphics\Controller;
+namespace Mouf\Utils\Graphics\ImagePresetDisplayer\Controller;
 
 use Mouf\Controllers\AbstractMoufInstanceController;
 use Mouf\MoufManager;
@@ -28,7 +28,7 @@ class ImagePresetDisplayerController extends AbstractMoufInstanceController {
 		$instanceDescriptor = $this->moufManager->getInstanceDescriptor($name);
 		$this->targetDir = $instanceDescriptor->getProperty('savePath')->getValue();
 		
-		$this->content->addFile(dirname(__FILE__)."/../../../../views/htaccessGenerate.php", $this);
+		$this->content->addFile(dirname(__FILE__)."/../../../../../views/htaccessGenerate.php", $this);
 		$this->template->toHtml();
 	}
 	
@@ -41,6 +41,7 @@ class ImagePresetDisplayerController extends AbstractMoufInstanceController {
 	public function createHtAccess($name) {
 		$this->initController($name, "false");
 
+		$instanceDescriptor = $this->moufManager->getInstanceDescriptor($name);
 		$this->targetDir = $instanceDescriptor->getProperty('savePath')->getValue();
 		
 		$staticImageDisplayer = new InstanceProxy($name);
