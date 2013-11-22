@@ -111,7 +111,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 // 		echo "$originalFilePath exits? ".(file_exists($originalFilePath) ? "ok" : "ko");exit;
 		$is404 = false;
 		if (!file_exists($originalFilePath)){
-			//error_log("file not exists : $originalFilePath");
+			error_log("file not exists : $originalFilePath");
 			if (empty($this->defaultImagePath)){
 				$originalFilePath = dirname(__FILE__).DIRECTORY_SEPARATOR."404_image.png";
 			}else{
@@ -134,7 +134,8 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 		$created = true;
 		if (!file_exists($finalPath) && !$is404){
 			//if sourceFileName contains sub folders, create them
-			if (/*$subPath != '.' && */!file_exists(ROOT_PATH . $this->getSavePath())){
+			$subPath = substr($this->sourceFileName, 0, strrpos($this->sourceFileName, "/"));
+			if ($subPath != '.' && !file_exists(ROOT_PATH . $this->getSavePath() . $subPath)){
 				$oldUmask = umask();
 				umask(0);
 				$dirCreate = mkdir(ROOT_PATH . $this->getSavePath() . DIRECTORY_SEPARATOR . $subPath, 0775, true);
