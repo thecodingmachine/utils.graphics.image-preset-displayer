@@ -135,7 +135,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 		if (!file_exists($finalPath) && !$is404){
 			//if sourceFileName contains sub folders, create them
 			$subPath = substr($this->sourceFileName, 0, strrpos($this->sourceFileName, "/"));
-			if ($subPath != '.' && !file_exists(ROOT_PATH . $this->getSavePath() . $subPath)){
+			if ($subPath != '.' && !file_exists(ROOT_PATH . $this->getSavePath() . "/" . $subPath)){
 				$oldUmask = umask();
 				umask(0);
 				$dirCreate = mkdir(ROOT_PATH . $this->getSavePath() . DIRECTORY_SEPARATOR . $subPath, 0775, true);
