@@ -229,7 +229,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
     RewriteCond %{REQUEST_FILENAME} !-f
     
     # Rewrite all other queries to the front controller.
-    RewriteRule ^(.*)$ %{ENV:BASE}".str_repeat("/..", $nbLevels)."/vendor/mouf/utils.graphics.image-preset-displayer/src/direct/displayImage.php?instance=$instanceName&url=$1 [L]
+    RewriteRule ^(.*)$ %{ENV:BASE}".str_repeat("/..", $nbLevels)."/vendor/mouf/utils.graphics.image-preset-displayer/src/direct/displayImage.php?instance=$instanceName&url=$1 [B,L]
 </IfModule>
 
 #<IfModule !mod_rewrite.c>
