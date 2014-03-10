@@ -188,7 +188,6 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 	public function validateInstance(){
 		$instanceName = MoufManager::getMoufManager()->findInstanceName($this);
 		$htAccessPath = ROOT_PATH.$this->getSavePath().DIRECTORY_SEPARATOR.".htaccess";
-		error_log("Validate imagedisplayer :: $instanceName");
 		if (!file_exists($htAccessPath)){
 			return new MoufValidatorResult(MoufValidatorResult::ERROR, "<b>Image Displayer: </b>Unable to find .htaccess file for instance: $instanceName <br/>" .
 					"<a href='".MOUF_URL."staticimagedisplayer/?name=$instanceName' class='btn btn-primary'>Create .htaccess file</a>");
