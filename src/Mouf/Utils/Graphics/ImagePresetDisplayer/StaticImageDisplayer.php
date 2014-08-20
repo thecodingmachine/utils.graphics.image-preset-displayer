@@ -110,7 +110,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 		$originalFilePath = ROOT_PATH . $this->basePath . DIRECTORY_SEPARATOR . $this->sourceFileName;
 // 		echo "$originalFilePath exits? ".(file_exists($originalFilePath) ? "ok" : "ko");exit;
 		$is404 = false;
-		if (!file_exists($originalFilePath)){
+		if (!file_exists($originalFilePath) || !is_file($originalFilePath)){
 			error_log("file not exists : $originalFilePath");
 			if (empty($this->defaultImagePath)){
 				$originalFilePath = dirname(__FILE__).DIRECTORY_SEPARATOR."404_image.png";
@@ -126,34 +126,42 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 		$finalImage = $moufImageResource->resource;
 		$image_info = $moufImageResource->originInfo;
 		$image_type = $image_info[2];
-		
 		//Original file's relative path is the file's key, so no need to check whether there is already an image with the same file name
 		$finalPath = ROOT_PATH . $this->getSavePath() . DIRECTORY_SEPARATOR . $this->sourceFileName;
 		
-		
 		$created = true;
 		if (!file_exists($finalPath) && !$is404){
-			//if sourceFileName contains sub folders, create them
-			$subPath = substr($this->sourceFileName, 0, strrpos($this->sourceFileName, "/"));
-			if ($subPath != '.' && !file_exists(ROOT_PATH . $this->getSavePath() . "/" . $subPath)){
-				$oldUmask = umask();
-				umask(0);
-				$dirCreate = mkdir(ROOT_PATH . $this->getSavePath() . DIRECTORY_SEPARATOR . $subPath, 0775, true);
-				umask($oldUmask);
-				if (!$dirCreate) {
-					throw new \Exception("Could't create subfolders '$subPath' in " . ROOT_PATH . $this->getSavePath());
+			if($finalImage) {
+				//if sourceFileName contains sub folders, create them
+				$subPath = substr($this->sourceFileName, 0, strrpos($this->sourceFileName, "/"));
+				if ($subPath != '.' && !file_exists(ROOT_PATH . $this->getSavePath() . "/" . $subPath)){
+					$oldUmask = umask();
+					umask(0);
+					$dirCreate = mkdir(ROOT_PATH . $this->getSavePath() . DIRECTORY_SEPARATOR . $subPath, 0775, true);
+					umask($oldUmask);
+					if (!$dirCreate) {
+						throw new \Exception("Could't create subfolders '$subPath' in " . ROOT_PATH . $this->getSavePath());
+					}
+				}
+				
+				//create the image
+				if( $image_type == IMAGETYPE_JPEG ) {
+					$created = imagejpeg($finalImage, $finalPath, $this->jpegQuality);
+				} elseif( $image_type == IMAGETYPE_GIF ) {
+					$created = imagegif($finalImage, $finalPath);
+				} elseif( $image_type == IMAGETYPE_PNG ) {
+					$created = imagepng($finalImage, $finalPath, $this->pngQuality);
+				}
+				chmod($finalPath, 0664);
+			}
+			else {
+				$is404 = true;
+				if (empty($this->defaultImagePath)){
+					$originalFilePath = dirname(__FILE__).DIRECTORY_SEPARATOR."404_image.png";
+				}else{
+					$originalFilePath = ROOT_PATH.$this->defaultImagePath;
 				}
 			}
-			
-			//create the image
-			if( $image_type == IMAGETYPE_JPEG ) {
-				$created = imagejpeg($finalImage, $finalPath, $this->jpegQuality);
-			} elseif( $image_type == IMAGETYPE_GIF ) {
-				$created = imagegif($finalImage, $finalPath);
-			} elseif( $image_type == IMAGETYPE_PNG ) {
-				$created = imagepng($finalImage, $finalPath, $this->pngQuality);
-			}
-			chmod($finalPath, 0664);
 		}
 		
 		if (!$created && !$is404) throw new Exception("File could not be created: $finalPath");
