@@ -265,4 +265,13 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 	private function getSavePath() {
 		return str_replace("\\", "/", trim($this->savePath, "/\\"));
 	}
+	
+	public static function purgeAllPresets($path = null){
+		$instances = MoufManager::getMoufManager()->findInstances("Mouf\\Utils\\Graphics\\ImagePresetDisplayer\\StaticImageDisplayer");
+		foreach ($instances as $instanceName){
+			/* @var $instance StaticImageDisplayer */
+			$instance =  MoufManager::getMoufManager()->get($instanceName);
+			unlink(ROOT_PATH . $instance->savePath . $path);
+		}
+	}
 }
