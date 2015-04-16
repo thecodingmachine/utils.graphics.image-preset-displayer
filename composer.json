@@ -17,7 +17,7 @@
 		"MIT"
 	],
 	"require" : {
-		"mouf/utils.graphics.mouf-image" : "~2.0",
+		"mouf/utils.graphics.mouf-image" : "~3.0",
 		"mouf/mouf-installer" : "~2.0",
 		"php" : ">=5.3.0",
 		"mouf/mouf-validators-interface" : "~2.0"
