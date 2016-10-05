@@ -100,7 +100,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 	 * Output the image: 
 	 *   - original image is loaded by the $initialImageFilter, 
 	 *   - final image (given by the $imageSource) is outputed (and saved if it doesn't exist yet)
-	 * @throws Exception
+	 * @throws \Exception
 	 */
 	public function outputImage(){
 		//Prevent from acessing parent folders
@@ -164,7 +164,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 			}
 		}
 		
-		if (!$created && !$is404) throw new Exception("File could not be created: $finalPath");
+		if (!$created && !$is404) throw new \Exception("File could not be created: $finalPath");
 		
 		// FIXME: si on recalcule l'image à chaque fois, il n'y a aucun intérêt à avoir un cache!!!!
 		if( $image_type == IMAGETYPE_JPEG ) {
