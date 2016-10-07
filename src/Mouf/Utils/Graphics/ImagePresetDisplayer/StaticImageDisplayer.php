@@ -104,7 +104,7 @@ class StaticImageDisplayer implements MoufValidatorInterface {
 	 */
 	public function outputImage(){
 		//Prevent from acessing parent folders
-		if (strpos($this->sourceFileName, '..')) throw new Exception("Trying to access file in parent folders : '$sourceFileName'");
+		if (strpos($this->sourceFileName, '..')) throw new \Exception("Trying to access file in parent folders : '$sourceFileName'");
 		
 		//rebuild the original file pathe from the root image folder and the relative file's pathe
 		$originalFilePath = ROOT_PATH . $this->basePath . DIRECTORY_SEPARATOR . $this->sourceFileName;
